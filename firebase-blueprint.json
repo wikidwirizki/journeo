@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "trip": {
+      "title": "Trip",
+      "description": "A travel itinerary",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "destination": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "budget": { "type": "number" },
+        "currency": { "type": "string" }
+      },
+      "required": ["userId", "name", "destination", "startDate", "endDate"]
+    },
+    "itineraryItem": {
+      "title": "Itinerary Item",
+      "description": "An event in a trip",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tripId": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string" },
+        "location": { "type": "string" },
+        "googleMapsUrl": { "type": "string" },
+        "notes": { "type": "string" },
+        "cost": { "type": "number" }
+      },
+      "required": ["userId", "tripId", "date", "title", "type"]
+    },
+    "expense": {
+      "title": "Expense",
+      "description": "A cost record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tripId": { "type": "string" },
+        "title": { "type": "string" },
+        "amount": { "type": "number" },
+        "budgetAmount": { "type": "number" },
+        "currency": { "type": "string" },
+        "isPaid": { "type": "boolean" },
+        "date": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["userId", "tripId", "title", "amount", "date", "category"]
+    },
+    "attachment": {
+      "title": "Attachment",
+      "description": "A document attached to a trip",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tripId": { "type": "string" },
+        "title": { "type": "string" },
+        "fileData": { "type": "string" },
+        "fileType": { "type": "string" },
+        "dateAdded": { "type": "string" }
+      },
+      "required": ["userId", "tripId", "title", "fileData", "fileType", "dateAdded"]
+    },
+    "outfit": {
+      "title": "Outfit",
+      "description": "Clothing plan",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tripId": { "type": "string" },
+        "date": { "type": "string" },
+        "photoData": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["userId", "tripId", "photoData"]
+    },
+    "packingItem": {
+      "title": "Packing Item",
+      "description": "Item to pack",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tripId": { "type": "string" },
+        "title": { "type": "string" },
+        "isPacked": { "type": "boolean" },
+        "category": { "type": "string" }
+      },
+      "required": ["userId", "tripId", "title", "isPacked", "category"]
+    }
+  },
+  "firestore": {
+    "/trips/{tripId}": {
+      "schema": "trip",
+      "description": "User's trips"
+    },
+    "/trips/{tripId}/itinerary/{itemId}": {
+      "schema": "itineraryItem",
+      "description": "Events in a trip"
+    },
+    "/trips/{tripId}/expenses/{expenseId}": {
+      "schema": "expense",
+      "description": "Expenses in a trip"
+    },
+    "/trips/{tripId}/attachments/{attachmentId}": {
+      "schema": "attachment",
+      "description": "Attachments in a trip"
+    },
+    "/trips/{tripId}/outfits/{outfitId}": {
+      "schema": "outfit",
+      "description": "Outfits for a trip"
+    },
+    "/trips/{tripId}/packingItems/{itemId}": {
+      "schema": "packingItem",
+      "description": "Packing items"
+    }
+  }
+}
