@@ -63,6 +63,18 @@ export const getTrips = async (userId: string): Promise<Trip[]> => {
   }
 };
 
+export const getAllTrips = async (): Promise<Trip[]> => {
+  try {
+    const q = query(collection(db, 'trips'));
+    const snapshot = await getDocs(q);
+    const trips = snapshot.docs.map(doc => doc.data() as Trip);
+    return trips.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  } catch (err) {
+    handleFirestoreError(err, OperationType.LIST, 'trips_all');
+    return [];
+  }
+};
+
 export const getTrip = async (id: string): Promise<Trip | null> => {
   try {
     const docRef = doc(db, 'trips', id);

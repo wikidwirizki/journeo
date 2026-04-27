@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ArrowLeft, MapPin, Calendar, Settings, Image as ImageIcon, Share, Trash2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Settings, Image as ImageIcon, Share, Trash2, LogIn } from 'lucide-react';
 import { Trip } from '../../types';
 import { getTrip, saveTrip, fileToBase64, deleteTrip } from '../../store/db';
 import { useAuth } from '../../contexts/AuthContext';
@@ -18,8 +18,8 @@ export default function TripDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isViewOnly = searchParams.get('viewOnly') === 'true';
-  const { user } = useAuth();
+  const { user, isGuest, logout } = useAuth();
+  const isViewOnly = searchParams.get('viewOnly') === 'true' || (isGuest && !user);
   const [trip, setTrip] = useState<Trip | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('itinerary');
   const [showEditModal, setShowEditModal] = useState(false);
@@ -64,16 +64,6 @@ export default function TripDetails() {
     setShowEditModal(true);
   };
 
-  const handleShare = async () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?viewOnly=true`;
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('View-only link copied to clipboard!');
-    } catch {
-      prompt('Copy this view-only link:', shareUrl);
-    }
-  };
-
   const handleDeleteTrip = async () => {
     if (confirm('Are you sure you want to delete this trip? This action cannot be undone.')) {
       await deleteTrip(trip!.id);
@@ -104,13 +94,16 @@ export default function TripDetails() {
         )}
         
         <div className="absolute inset-x-0 top-0 p-4 flex justify-between items-center z-10">
-          <button onClick={() => navigate(isViewOnly ? '/?viewOnly=true' : '/')} className="w-10 h-10 rounded-full bg-white border border-[#0C2B4E]/10 text-[#0C2B4E] flex items-center justify-center hover:bg-neutral-100 transition shadow-sm">
+          <button onClick={() => navigate(isViewOnly && (!isGuest || user) ? '/?viewOnly=true' : '/')} className="w-10 h-10 rounded-full bg-white border border-[#0C2B4E]/10 text-[#0C2B4E] flex items-center justify-center hover:bg-neutral-100 transition shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <button onClick={handleShare} className="w-10 h-10 rounded-full bg-white border border-[#0C2B4E]/10 text-[#0C2B4E] flex items-center justify-center hover:bg-neutral-100 transition shadow-sm" title="Share public view link">
-              <Share className="w-4 h-4" />
-            </button>
+            {isGuest && !user && (
+              <button onClick={logout} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-[#0C2B4E] hover:bg-neutral-100 transition-colors font-bold text-xs uppercase tracking-widest shadow-sm" title="Sign In">
+                <LogIn className="w-4 h-4" />
+                Sign In
+              </button>
+            )}
             {!isViewOnly && (
               <button onClick={openEditModal} className="w-10 h-10 rounded-full bg-white border border-[#0C2B4E]/10 text-[#0C2B4E] flex items-center justify-center hover:bg-neutral-100 transition shadow-sm">
                 <Settings className="w-5 h-5" />

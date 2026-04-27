@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, MapPin, Calendar, Compass, Image as ImageIcon, LogOut } from 'lucide-react';
+import { Plus, MapPin, Calendar, Compass, Image as ImageIcon, LogOut, LogIn } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
-import { getTrips, saveTrip, fileToBase64 } from '../store/db';
+import { getTrips, getAllTrips, saveTrip, fileToBase64 } from '../store/db';
 import { Trip } from '../types';
 import { format } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,19 +13,23 @@ export default function Trips() {
   const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isViewOnly = searchParams.get('viewOnly') === 'true';
-  const { user, logout } = useAuth();
+  const { user, isGuest, logout } = useAuth();
+  const isViewOnly = searchParams.get('viewOnly') === 'true' || (isGuest && !user);
 
   useEffect(() => {
-    if (user) {
+    if (user || isGuest) {
       loadTrips();
     }
-  }, [user]);
+  }, [user, isGuest]);
 
   const loadTrips = async () => {
-    if (!user) return;
-    const data = await getTrips(user.uid);
-    setTrips(data);
+    if (isGuest && !user) {
+      const data = await getAllTrips();
+      setTrips(data);
+    } else if (user) {
+      const data = await getTrips(user.uid);
+      setTrips(data);
+    }
   };
 
   const handleAddTrip = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,11 +66,16 @@ export default function Trips() {
           <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#288C78] mb-1 block">Your Upcoming</span>
           <h1 className="text-4xl font-serif italic tracking-tight text-[#0C2B4E]">Journeo</h1>
         </div>
-        {!isViewOnly && (
+        {isGuest && !user ? (
+          <button onClick={logout} className="flex items-center gap-2 p-2 px-3 bg-[#0C2B4E]/5 rounded-xl text-[#0C2B4E] hover:bg-[#0C2B4E]/10 transition-colors font-bold text-xs uppercase tracking-widest" title="Sign In">
+            <LogIn className="w-4 h-4" />
+            Sign In
+          </button>
+        ) : !isViewOnly ? (
           <button onClick={logout} className="p-2 text-[#0C2B4E]/50 hover:text-[#0C2B4E] transition-colors" title="Log out">
             <LogOut className="w-5 h-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
       {/* Trips List */}

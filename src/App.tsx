@@ -7,9 +7,9 @@ import Login from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, isGuest, loading } = useAuth();
   if (loading) return null;
-  if (!user) return <Navigate to="/login" />;
+  if (!user && !isGuest) return <Navigate to="/login" />;
   return <>{children}</>;
 }
 
