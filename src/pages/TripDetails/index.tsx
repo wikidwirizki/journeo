@@ -65,12 +65,6 @@ export default function TripDetails() {
   };
 
   const handleShare = async () => {
-    // If running inside the AI Studio dev iframe, the raw URL is private (returns 403).
-    if (window.location.hostname.includes('ais-dev-') || window.location.hostname.includes('ais-pre-')) {
-      alert('Untuk membagikan aplikasi ini, silakan gunakan tombol "Share" (Bagikan) di bagian atas kanan editor AI Studio, atau bagikan link publik setelah Anda men-deploy aplikasi ini ke tahap production.');
-      return;
-    }
-
     const shareUrl = `${window.location.origin}${window.location.pathname}?viewOnly=true`;
     try {
       await navigator.clipboard.writeText(shareUrl);
