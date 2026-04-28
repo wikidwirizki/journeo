@@ -12,7 +12,8 @@
         "endDate": { "type": "string" },
         "coverImage": { "type": "string" },
         "budget": { "type": "number" },
-        "currency": { "type": "string" }
+        "currency": { "type": "string" },
+        "isPublic": { "type": "boolean" }
       },
       "required": ["userId", "name", "destination", "startDate", "endDate"]
     },

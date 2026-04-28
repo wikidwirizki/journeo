@@ -72,7 +72,6 @@ export default function BudgetTab({ tripId, trip }: { tripId: string, trip: Trip
 
     const newExpense: Expense = {
       id: editId || uuidv4(),
-      userId: user?.uid,
       tripId,
       title,
       amount: Number(amount) || 0,
@@ -82,13 +81,15 @@ export default function BudgetTab({ tripId, trip }: { tripId: string, trip: Trip
       date,
       category
     };
+    if (user?.uid) newExpense.userId = user.uid;
 
     await saveExpense(newExpense);
     cancelEdit();
     loadExpenses();
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (editId && confirm('Are you sure you want to delete this expense?')) {
       await deleteExpense(tripId, editId);
       cancelEdit();

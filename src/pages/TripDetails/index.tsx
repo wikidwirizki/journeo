@@ -53,6 +53,7 @@ export default function TripDetails() {
       budget: Number(formData.get('budget')) || 0,
       currency: formData.get('currency') as string || 'USD',
       coverImage: editCoverImage !== undefined ? editCoverImage : trip.coverImage,
+      isPublic: formData.get('isPublic') === 'on',
     };
     await saveTrip(updatedTrip);
     setTrip(updatedTrip);
@@ -217,6 +218,20 @@ export default function TripDetails() {
                   <input required name="budget" type="number" defaultValue={trip.budget || 0} placeholder="e.g. 5000" className="w-full bg-transparent border-b border-[#0C2B4E]/20 py-2 focus:border-[#288C78] outline-none transition-colors" />
                 </div>
               </div>
+
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer w-fit mt-2">
+                  <div className="relative flex items-center justify-center">
+                    <input name="isPublic" type="checkbox" defaultChecked={trip.isPublic} className="peer appearance-none w-5 h-5 border-2 border-[#0C2B4E]/20 rounded-md checked:bg-[#288C78] checked:border-[#288C78] transition-colors cursor-pointer" />
+                    <svg className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#0C2B4E] block">Public Trip</span>
+                    <span className="text-[10px] text-[#0C2B4E]/50 block">Allow guests to view this trip</span>
+                  </div>
+                </label>
+              </div>
+
               <div className="flex gap-2 mt-6">
                  <button type="button" onClick={handleDeleteTrip} className="flex-1 bg-red-100 text-red-600 text-[11px] uppercase tracking-[0.2em] font-bold py-4 hover:bg-red-200 transition-colors rounded-xl">
                    Delete

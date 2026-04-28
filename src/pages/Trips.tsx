@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, MapPin, Calendar, Compass, Image as ImageIcon, LogOut, LogIn } from 'lucide-react';
+import { Plus, MapPin, Calendar, Compass, Image as ImageIcon, LogOut, LogIn, Globe, Lock } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { getTrips, getAllTrips, saveTrip, fileToBase64 } from '../store/db';
 import { Trip } from '../types';
@@ -49,6 +49,7 @@ export default function Trips() {
       budget: Number(formData.get('budget')) || 0,
       currency: formData.get('currency') as string || 'USD',
       coverImage,
+      isPublic: formData.get('isPublic') === 'on',
     };
 
     await saveTrip(newTrip);
@@ -102,6 +103,21 @@ export default function Trips() {
                 {!trip.coverImage && (
                   <div className="absolute inset-0 flex items-center justify-center opacity-30 bg-[#0C2B4E]">
                     <MapPin className="w-12 h-12 text-white" />
+                  </div>
+                )}
+                {user && !isViewOnly && (
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                    {trip.isPublic ? (
+                      <>
+                        <Globe className="w-3 h-3 text-[#288C78]" />
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#288C78]">Public</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-3 h-3 text-[#0C2B4E]/60" />
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#0C2B4E]/60">Private</span>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -194,6 +210,19 @@ export default function Trips() {
                   <label className="block text-[10px] font-bold text-[#288C78] uppercase tracking-widest mb-1">Total Budget</label>
                   <input required name="budget" type="number" placeholder="e.g. 5000" className="w-full bg-transparent border-b border-[#0C2B4E]/20 py-2 focus:border-[#288C78] outline-none transition-colors" />
                 </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer w-fit mt-2">
+                  <div className="relative flex items-center justify-center">
+                    <input name="isPublic" type="checkbox" defaultChecked={false} className="peer appearance-none w-5 h-5 border-2 border-[#0C2B4E]/20 rounded-md checked:bg-[#288C78] checked:border-[#288C78] transition-colors cursor-pointer" />
+                    <svg className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#0C2B4E] block">Public Trip</span>
+                    <span className="text-[10px] text-[#0C2B4E]/50 block">Allow guests to view this trip</span>
+                  </div>
+                </label>
               </div>
               
               <button type="submit" className="w-full bg-[#0C2B4E] text-white text-[11px] uppercase tracking-[0.2em] font-bold py-4 mt-6 hover:bg-[#1a416e] transition-colors rounded-xl flex justify-center items-center gap-2">

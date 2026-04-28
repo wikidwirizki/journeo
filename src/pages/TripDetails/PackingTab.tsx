@@ -33,12 +33,12 @@ export default function PackingTab({ tripId }: { tripId: string }) {
 
     const newItem: PackingItem = {
       id: uuidv4(),
-      userId: user?.uid,
       tripId,
       title: newItemTitle,
       isPacked: false,
       category: newItemCategory,
     };
+    if (user?.uid) newItem.userId = user.uid;
 
     await savePackingItem(newItem);
     setNewItemTitle('');
@@ -55,6 +55,7 @@ export default function PackingTab({ tripId }: { tripId: string }) {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (isViewOnly) return;
     if (confirm('Are you sure you want to delete this item?')) {
       await deletePackingItem(tripId, id);

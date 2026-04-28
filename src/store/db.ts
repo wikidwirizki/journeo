@@ -65,7 +65,7 @@ export const getTrips = async (userId: string): Promise<Trip[]> => {
 
 export const getAllTrips = async (): Promise<Trip[]> => {
   try {
-    const q = query(collection(db, 'trips'));
+    const q = query(collection(db, 'trips'), where('isPublic', '==', true));
     const snapshot = await getDocs(q);
     const trips = snapshot.docs.map(doc => doc.data() as Trip);
     return trips.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
@@ -276,6 +276,11 @@ export const fileToBase64 = (file: File): Promise<string> => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
+      // If it's not an image, just return the base64
+      if (!file.type.startsWith('image/')) {
+        return resolve(reader.result as string);
+      }
+      
       // Create an image to resize
       const img = new Image();
       img.src = reader.result as string;
@@ -285,7 +290,7 @@ export const fileToBase64 = (file: File): Promise<string> => {
         let height = img.height;
         
         // Max dimension
-        const MAX_DIM = 800;
+        const MAX_DIM = 2000;
         if (width > height) {
           if (width > MAX_DIM) {
              height *= MAX_DIM / width;
@@ -302,8 +307,13 @@ export const fileToBase64 = (file: File): Promise<string> => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
+          // If we are saving as JPEG, fill with white background first to avoid black transparency
+          if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+          }
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.6); // 60% quality jpeg
+          const dataUrl = canvas.toDataURL(file.type || 'image/png', 0.85); 
           resolve(dataUrl);
         } else {
           resolve(reader.result as string);

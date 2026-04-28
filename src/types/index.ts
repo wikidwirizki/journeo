@@ -8,6 +8,7 @@ export interface Trip {
   coverImage?: string; // base64 or URL
   budget: number;
   currency?: string; // e.g., 'IDR', 'JPY', 'EUR', 'USD'
+  isPublic?: boolean;
 }
 
 export type ActivityType = 'flight' | 'hotel' | 'activity' | 'food' | 'transport';

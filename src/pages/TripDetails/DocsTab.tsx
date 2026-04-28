@@ -63,13 +63,13 @@ export default function DocsTab({ tripId }: { tripId: string }) {
 
       const newDoc: Attachment = {
         id: editId || uuidv4(),
-        userId: user?.uid,
         tripId,
         title,
         fileData: base64,
         fileType: fileType,
         dateAdded: new Date().toISOString()
       };
+      if (user?.uid) newDoc.userId = user.uid;
       await saveAttachment(newDoc);
       cancelEdit();
       loadDocs();
@@ -79,7 +79,8 @@ export default function DocsTab({ tripId }: { tripId: string }) {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (editId && confirm('Are you sure you want to delete this document?')) {
       await deleteAttachment(tripId, editId);
       cancelEdit();
@@ -92,7 +93,7 @@ export default function DocsTab({ tripId }: { tripId: string }) {
     const newWindow = window.open();
     if (newWindow) {
       newWindow.document.write(
-        `<iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>`
+        `<body style="margin:0; background:white; height:100vh; overflow:hidden;"><iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe></body>`
       );
     }
   };

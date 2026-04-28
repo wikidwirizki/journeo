@@ -125,23 +125,24 @@ export default function ItineraryTab({ tripId }: { tripId: string }) {
     
     const newItem: ItineraryItem = {
       id: editId || uuidv4(),
-      userId: user?.uid,
       tripId,
       date,
-      time: time || undefined,
       title,
       type,
-      location,
-      googleMapsUrl,
-      notes,
     };
+    if (user?.uid) newItem.userId = user.uid;
+    if (time) newItem.time = time;
+    if (location) newItem.location = location;
+    if (googleMapsUrl) newItem.googleMapsUrl = googleMapsUrl;
+    if (notes) newItem.notes = notes;
 
     await saveItineraryItem(newItem);
     cancelEdit();
     loadItinerary();
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (editId && confirm('Are you sure you want to delete this event?')) {
       await deleteItineraryItem(tripId, editId);
       cancelEdit();

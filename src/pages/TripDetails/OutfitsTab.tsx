@@ -65,12 +65,22 @@ export default function OutfitsTab({ tripId }: { tripId: string }) {
     try {
       const newOutfit: Outfit = {
         id: editId || uuidv4(),
-        userId: user?.uid,
         tripId,
         photoData: photoPreview,
-        description: desc,
-        date: dateStr || undefined
       };
+      
+      if (user?.uid) {
+        newOutfit.userId = user.uid;
+      }
+      
+      if (desc) {
+        newOutfit.description = desc;
+      }
+      
+      if (dateStr) {
+        newOutfit.date = dateStr;
+      }
+
       await saveOutfit(newOutfit);
       cancelEdit();
       loadOutfits();
@@ -79,7 +89,8 @@ export default function OutfitsTab({ tripId }: { tripId: string }) {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (editId && confirm('Are you sure you want to delete this outfit?')) {
       await deleteOutfit(tripId, editId);
       cancelEdit();
